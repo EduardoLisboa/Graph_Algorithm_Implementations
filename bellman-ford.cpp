@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <climits>
 using namespace std;
 
 /* -------------------------------------------------- */
@@ -21,23 +22,13 @@ public:
     Aresta* aresta;
 };
 
-class Subset
-{
-public:
-    int pai;
-    int rank;
-};
-
 
 /* -------------------------------------------------- */
 /* --------------------- FUNÇÕES -------------------- */
 /* -------------------------------------------------- */
 
 Grafo* criarGrafo(int V, int E);
-int find(Subset subsets[], int i);
-void Union(Subset subsets[], int x, int y);
-int comparar(const void* a, const void* b);
-void KruskalMST(Grafo* grafo);
+void bellmanFord(struct Grafo* grafo, int orig);
 
 
 /* --------------------------------------------------- */
@@ -125,7 +116,7 @@ int main(int argc, char **argv)
         file.close();
     }
 
-    KruskalMST(G);
+    bellmanFord(G, 0);
 
     return 0;
 }
@@ -140,86 +131,48 @@ Grafo* criarGrafo(int V, int E)
     Grafo* grafo = new Grafo;
     grafo->V = V;
     grafo->E = E;
-
     grafo->aresta = new Aresta[E];
-
     return grafo;
 }
 
 
-int find(Subset subsets[], int i)
-{
-    if (subsets[i].pai != i)
-        subsets[i].pai = find(subsets, subsets[i].pai);
-
-    return subsets[i].pai;
-}
-
-
-void Union(Subset subsets[], int x, int y)
-{
-    int raizX = find(subsets, x);
-    int raizY = find(subsets, y);
-
-    if (subsets[raizX].rank < subsets[raizY].rank)
-        subsets[raizX].pai = raizY;
-    else if (subsets[raizX].rank > subsets[raizY].rank)
-        subsets[raizY].pai = raizX;
-
-    else
-    {
-        subsets[raizY].pai = raizX;
-        subsets[raizX].rank++;
-    }
-}
-
-
-int comparar(const void* a, const void* b)
-{
-    Aresta* a1 = (Aresta*)a;
-    Aresta* b1 = (Aresta*)b;
-    return a1->peso > b1->peso;
-}
-
-
-void KruskalMST(Grafo* grafo)
+void bellmanFord(struct Grafo* grafo, int orig)
 {
     int V = grafo->V;
-    Aresta result[V];
-    int e = 0;
-    int i = 0;
+    int E = grafo->E;
+    int dist[V];
 
-    qsort(grafo->aresta, grafo->E, sizeof(grafo->aresta[0]), comparar);
+    for (int i = 0; i < V; i++)
+        dist[i] = INT_MAX;
+    dist[orig] = 0;
 
-    Subset* subsets = new Subset[(V * sizeof(Subset))];
-
-    for (int v = 0; v < V; ++v)
+    for (int i = 1; i < V - 1; i++)
     {
-        subsets[v].pai = v;
-        subsets[v].rank = 0;
-    }
-
-    while (e < V - 1 && i < grafo->E)
-    {
-        Aresta proximaAresta = grafo->aresta[i++];
-
-        int x = find(subsets, proximaAresta.orig);
-        int y = find(subsets, proximaAresta.dest);
-
-        if (x != y)
+        for (int j = 0; j < E; j++)
         {
-            result[e++] = proximaAresta;
-            Union(subsets, x, y);
+            int u = grafo->aresta[j].orig;
+            int v = grafo->aresta[j].dest;
+            int peso = grafo->aresta[j].peso;
+            if (dist[u] != INT_MAX && dist[u] + peso < dist[v])
+                dist[v] = dist[u] + peso;
         }
     }
 
-    cout << "As arestas da MST construida:" << endl;
-    int custoMinimo = 0;
-    for (i = 0; i < e; ++i)
+    for (int i = 0; i < E; i++)
     {
-        cout << result[i].orig << " -- " << result[i].dest << " = " << result[i].peso << endl;
-        custoMinimo = custoMinimo + result[i].peso;
+        int u = grafo->aresta[i].orig;
+        int v = grafo->aresta[i].dest;
+        int peso = grafo->aresta[i].peso;
+        if (dist[u] != INT_MAX && dist[u] + peso < dist[v])
+        {
+            cout << "Grafo contem ciclo de peso negativo" << endl;
+            return;
+        }
     }
 
-    cout << "Custo Minimo de Arvore Geradora: " << custoMinimo << endl;
+    cout << "Vertice   Distancia da Origem" << endl;
+    for (int i = 0; i < V; i++)
+        cout << i << " \t\t " << dist[i] << endl;
+
+    return;
 }

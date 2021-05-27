@@ -23,9 +23,9 @@ int fordFulkerson(int graph[Vertices][Vertices], int orig, int dest);
 
 int main(int argc, char **argv)
 {
-    string line;
+    string linha;
     string sub;
-    stringstream aux;
+    stringstream strParaIntAux;
     list<int> vertices;
     int i = 0;
     int V, E;
@@ -40,53 +40,53 @@ int main(int argc, char **argv)
     file.open(argv[1], ios::in);
     if(file.is_open())
     {
-        getline(file, line);
-        for(int lineIndex = 0; lineIndex < line.length(); lineIndex++)
+        getline(file, linha);
+        for(int indiceLinha = 0; indiceLinha < linha.length(); indiceLinha++)
         {
-            if (line[lineIndex] != ' ')
-                sub += line[lineIndex];
+            if (linha[indiceLinha] != ' ')
+                sub += linha[indiceLinha];
             else
             {
-                aux << sub;
-                aux >> V;
+                strParaIntAux << sub;
+                strParaIntAux >> V;
                 sub.clear();
-                aux.clear();
+                strParaIntAux.clear();
             }
         }
-        aux << sub;
-        aux >> E;
+        strParaIntAux << sub;
+        strParaIntAux >> E;
         sub.clear();
-        while(getline(file, line))
+        while(getline(file, linha))
         {
             i = 0;
             sub.clear();
-            for(int lineIndex = 0; lineIndex < line.length(); lineIndex++)
+            for(int indiceLinha = 0; indiceLinha < linha.length(); indiceLinha++)
             {
-                if (line[lineIndex] != ' ')
-                    sub += line[lineIndex];
+                if (linha[indiceLinha] != ' ')
+                    sub += linha[indiceLinha];
                 else
                 {
                     if(i == 0)
                     {
-                        aux << sub;
-                        aux >> orig;
+                        strParaIntAux << sub;
+                        strParaIntAux >> orig;
                         sub.clear();
-                        aux.clear();
+                        strParaIntAux.clear();
                     }
                     else
                     {
-                        aux << sub;
-                        aux >> dest;
+                        strParaIntAux << sub;
+                        strParaIntAux >> dest;
                         sub.clear();
-                        aux.clear();
+                        strParaIntAux.clear();
                     }
                     i++;
                 }
             }
-            aux << sub;
-            aux >> peso;
+            strParaIntAux << sub;
+            strParaIntAux >> peso;
             sub.clear();
-            aux.clear();
+            strParaIntAux.clear();
 
             bool verticeExiste = false;
             for(auto item : vertices)

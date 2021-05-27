@@ -4,22 +4,21 @@
 #include <set>
 #include <fstream>
 #include <sstream>
+#include <climits>
 using namespace std;
-
-#define INF 0x3f3f3f3f
 
 
 /* -------------------------------------------------- */
 /* --------------------- CLASSES -------------------- */
 /* -------------------------------------------------- */
 
-class Graph
+class Grafo
 {
     int V;
     list<pair<int, int>> *adj;
 
 public:
-    Graph(int V);
+    Grafo(int V);
     void adicionarAresta(int orig, int dest, int peso);
     void dijkstra(int origem);
 };
@@ -29,25 +28,25 @@ public:
 /* --------------------- FUNÇÕES -------------------- */
 /* -------------------------------------------------- */
 
-Graph::Graph(int V)
+Grafo::Grafo(int V)
 {
     this->V = V;
     adj = new list<pair<int, int>>[V];
 }
 
 
-void Graph::adicionarAresta(int orig, int dest, int peso)
+void Grafo::adicionarAresta(int orig, int dest, int peso)
 {
     adj[orig].push_back(make_pair(dest, peso));
     adj[dest].push_back(make_pair(orig, peso));
 }
 
 
-void Graph::dijkstra(int origem)
+void Grafo::dijkstra(int origem)
 {
     set<pair<int, int>> setds;
 
-    vector<int> dist(V, INF);
+    vector<int> dist(V, INT_MAX);
 
     setds.insert(make_pair(0, origem));
     dist[origem] = 0;
@@ -62,14 +61,14 @@ void Graph::dijkstra(int origem)
         for (auto i = adj[u].begin(); i != adj[u].end(); i++)
         {
             int v = (*i).first;
-            int weight = (*i).second;
+            int peso = (*i).second;
 
-            if (dist[v] > dist[u] + weight)
+            if (dist[v] > dist[u] + peso)
             {
-                if (dist[v] != INF)
+                if (dist[v] != INT_MAX)
                     setds.erase(setds.find(make_pair(dist[v], v)));
 
-                dist[v] = dist[u] + weight;
+                dist[v] = dist[u] + peso;
                 setds.insert(make_pair(dist[v], v));
             }
         }
@@ -78,6 +77,8 @@ void Graph::dijkstra(int origem)
     cout << "Vertice   Distancia da Origem" << endl;
     for (int i = 0; i < V; i++)
         cout << i << " \t\t " << dist[i] << endl;
+    
+    return;
 }
 
 
@@ -87,9 +88,9 @@ void Graph::dijkstra(int origem)
 
 int main(int argc, char **argv)
 {
-    string line;
+    string linha;
     string sub;
-    stringstream aux;
+    stringstream strParaIntAux;
     list<int> vertices;
     int i = 0;
     int V, E;
@@ -99,54 +100,55 @@ int main(int argc, char **argv)
     file.open(argv[1], ios::in);
     if(file.is_open())
     {
-        getline(file, line);
-        for(int lineIndex = 0; lineIndex < line.length(); lineIndex++)
+        getline(file, linha);
+        for(int indiceLinha = 0; indiceLinha < linha.length(); indiceLinha++)
         {
-            if (line[lineIndex] != ' ')
-                sub += line[lineIndex];
+            if (linha[indiceLinha] != ' ')
+                sub += linha[indiceLinha];
             else
             {
-                aux << sub;
-                aux >> V;
+                strParaIntAux << sub;
+                strParaIntAux >> V;
                 sub.clear();
-                aux.clear();
+                strParaIntAux.clear();
             }
         }
-        aux << sub;
-        aux >> E;
+        strParaIntAux << sub;
+        strParaIntAux >> E;
         sub.clear();
-        Graph G(V);
-        while(getline(file, line))
+        strParaIntAux.clear();
+        Grafo G(V);
+        while(getline(file, linha))
         {
             i = 0;
             sub.clear();
-            for(int lineIndex = 0; lineIndex < line.length(); lineIndex++)
+            for(int indiceLinha = 0; indiceLinha < linha.length(); indiceLinha++)
             {
-                if (line[lineIndex] != ' ')
-                    sub += line[lineIndex];
+                if (linha[indiceLinha] != ' ')
+                    sub += linha[indiceLinha];
                 else
                 {
                     if(i == 0)
                     {
-                        aux << sub;
-                        aux >> orig;
+                        strParaIntAux << sub;
+                        strParaIntAux >> orig;
                         sub.clear();
-                        aux.clear();
+                        strParaIntAux.clear();
                     }
                     else
                     {
-                        aux << sub;
-                        aux >> dest;
+                        strParaIntAux << sub;
+                        strParaIntAux >> dest;
                         sub.clear();
-                        aux.clear();
+                        strParaIntAux.clear();
                     }
                     i++;
                 }
             }
-            aux << sub;
-            aux >> peso;
+            strParaIntAux << sub;
+            strParaIntAux >> peso;
             sub.clear();
-            aux.clear();
+            strParaIntAux.clear();
 
             bool verticeExiste = false;
             for(auto item : vertices)
