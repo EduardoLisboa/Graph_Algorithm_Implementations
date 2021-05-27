@@ -1,6 +1,10 @@
 # Graph Algorithm Implementations
 Implementação dos algoritmos de Kruskal, Dijkstra, Ford-Fulkerson e Bellman-Ford em C++.
 
+Alunos:
+* Eduardo Antônio de Lucena Lisboa
+* Jonathas Patrick H. de Azevedo
+
 
 #### Todos os códigos funcionam com o mesmo arquivo de testes.
 
